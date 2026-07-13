@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garmin_PDO_三住滑台選型工具</title>
+<style>
+:root{--bg:#f4f4f4;--card:#fff;--ink:#111;--mut:#777;--line:#e0e0e0;--ok:#0f7b3c;--warn:#d9730d;--ng:#d92d2d;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,"Segoe UI","PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;font-size:14px;}
+/* ===== 黑色頂欄 ===== */
+header.hero{background:#0d0d0d;color:#fff;padding:18px 28px 20px;}
+.hero-inner{max-width:1280px;margin:0 auto;}
+.hero-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;}
+.hero-brand{font-size:12px;letter-spacing:.22em;color:#eee;font-weight:600;margin-bottom:6px;}
+.hero-title{font-size:27px;font-weight:800;color:#fff;line-height:1.2;}
+.hero-title .ver{font-size:12px;font-weight:600;color:#bbb;margin-left:8px;}
+.hero-sub{font-size:12.5px;color:#aaa;margin-top:8px;}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;}
+.tabs button{background:transparent;color:#fff;border:1px solid #555;border-radius:2px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.tabs button:hover{border-color:#fff;}
+.tabs button.on{background:#fff;color:#0d0d0d;border-color:#fff;}
+/* ===== 版面 ===== */
+.wrap{max-width:1280px;margin:0 auto;padding:20px 28px 60px;}
+.pane{display:none;}
+.pane.on{display:block;}
+.split{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start;}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:18px;position:sticky;top:16px;}
+.main{min-width:0;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:18px 20px;margin-bottom:14px;}
+.card h2{font-size:16px;font-weight:800;margin-bottom:10px;}
+.card h3{font-size:14px;font-weight:800;margin:12px 0 6px;}
+.placeholder{color:var(--mut);text-align:center;padding:34px 10px;font-size:13.5px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;}
+label{display:block;font-size:12.5px;font-weight:700;margin:10px 0 4px;}
+label .u{font-weight:600;color:var(--mut);font-size:11.5px;}
+label .hint{display:block;font-weight:400;color:var(--mut);font-size:11px;line-height:1.4;margin-top:2px;}
+input,select{width:100%;padding:8px 9px;border:1px solid #cfcfcf;border-radius:2px;font-size:13.5px;background:#fff;font-family:inherit;color:var(--ink);}
+input:focus,select:focus{outline:1.5px solid #111;}
+.btn{display:block;width:100%;margin-top:16px;padding:11px;border:1px solid #111;border-radius:2px;background:#111;color:#fff;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit;}
+.btn:hover{background:#333;}
+.btn.ghost{background:#fff;color:#111;}
+.btn.ghost:hover{background:#f0f0f0;}
+.note{font-size:11.5px;color:var(--mut);margin-top:12px;line-height:1.6;}
+/* ===== 表格 ===== */
+.tblwrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px;}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top;white-space:nowrap;}
+td.wrapok{white-space:normal;min-width:180px;}
+th{background:#f7f7f7;font-weight:700;}
+/* ===== 指標卡 / 狀態 ===== */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px;}
+.metric{background:#fff;border:1px solid var(--line);border-radius:2px;padding:10px 12px;}
+.metric .k{font-size:11px;color:var(--mut);font-weight:700;}
+.metric .v{font-size:19px;font-weight:800;margin-top:2px;}
+.metric .s{font-size:11px;color:var(--mut);}
+.tag{display:inline-block;padding:1px 9px;border-radius:2px;font-size:11.5px;font-weight:800;border:1px solid;}
+.tag.ok{color:var(--ok);border-color:var(--ok);background:#eef7f1;}
+.tag.warn{color:var(--warn);border-color:var(--warn);background:#fdf3e8;}
+.tag.ng{color:var(--ng);border-color:var(--ng);background:#fdeaea;}
+.reco{border:1px solid var(--line);border-left:4px solid #111;border-radius:2px;background:#fff;padding:12px 16px;margin-bottom:12px;}
+.reco h3{font-size:15.5px;font-weight:800;margin:0 0 2px;}
+.reco .sub{font-size:12px;color:var(--mut);margin-bottom:6px;}
+.reco .score{float:right;font-size:13px;font-weight:800;}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:4px 16px;font-size:12.5px;margin:6px 0;}
+.kv b{font-weight:700;}
+a{color:#111;font-weight:600;}
+.step{border:1px solid var(--line);border-radius:2px;background:#fff;padding:12px 16px;margin-bottom:10px;}
+.step h4{font-size:14px;font-weight:800;margin-bottom:4px;}
+.step p{font-size:13px;color:#333;}
+.badge-src{font-size:11px;color:var(--mut);}
+@media(max-width:900px){.split{grid-template-columns:1fr;}.panel{position:static;}.hero-top{align-items:flex-start;flex-direction:column;}}
+@media print{header.hero{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.tabs,.panel,.no-print{display:none!important;}body{background:#fff;}.wrap{padding:10px;}.pane{display:none;}.pane.print-target{display:block!important;}.split{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+    <div>
+      <div class="hero-brand">GARMIN PDO</div>
+      <div class="hero-title">三住 滑台選型工具 <span class="ver">v1.1</span></div>
+    </div>
+    <div class="tabs" id="tabs">
+      <button data-t="flow">選型流程</button>
+      <button data-t="query">型號查詢</button>
+      <button data-t="reco" class="on">單軸條件推薦</button>
+      <button data-t="triple">三軸自組推薦</button>
+      <button data-t="eng">工程確認</button>
+    </div>
+    </div>
+    <div class="hero-sub">資料整理自 MISUMI。下載一律導向官方來源，最終規格以原廠 PDF / CAD 為準。</div>
+  </div>
+</header>
+<div class="wrap">
+
+<!-- ===== 選型流程 ===== -->
+<section class="pane" id="pane-flow">
+  <div class="card">
+    <h2>三軸挑選方向（建議順序：Z → Y → X）</h2>
+    <div class="step"><h4>Step 1｜定義需求</h4><p>先列出各軸行程、負載（含治具與上層軸本體重量）、節拍速度、重複精度、環境（標準 / 無塵）與安裝空間限制。</p></div>
+    <div class="step"><h4>Step 2｜Z 軸先選（限制最多）</h4><p>垂直可搬重量遠低於水平，且皮帶滑台（E-MTB / E-MCB）不可垂直使用。精密定位選 E-MGT 或 E-MTH（無塵改 E-MCH），大垂直負載選 E-MTH22 / E-MCH22（垂直 55 kg）。垂直軸建議小導程＋制動（煞車）馬達。</p></div>
+    <div class="step"><h4>Step 3｜Y 軸次選</h4><p>Y 軸負載＝工件＋治具＋Z 軸本體重量，以水平可搬重量挑選；一般用 E-MGT / E-MTH 螺桿，無塵環境用 E-MCH。</p></div>
+    <div class="step"><h4>Step 4｜X 軸最後</h4><p>X 軸承載 Y＋Z 總重，通常行程最長。長行程高速搬送選皮帶 E-MTB10 / E-MTB14（±0.04 mm，行程至 2550 mm）；需高精度則用螺桿 E-MGT / E-MTH / E-MCH（±0.01 mm）。</p></div>
+    <div class="step"><h4>Step 5｜單軸自組直交</h4><p>MISUMI Economy 系列皆為單軸滑台，無標準直交模組；XY / XYZ 平台以單軸自組，轉接板與支架需自行設計。可用「三軸自組推薦」分頁產生 X / Y / Z 組合建議。本體均不含馬達與驅動器，需依馬達位置代碼（BC / BL / BM / BR）與馬達功率另購。</p></div>
+    <div class="step"><h4>Step 6｜工程確認</h4><p>導程取捨（大導程＝高速低推力；小導程＝高推力低速）、負載裕度控在 50～80%、訂購行程以 50 mm 級距進位，並校核靜態容許力矩（MY / MP / MR）與重心偏移。可用本工具「工程確認」分頁初判。</p></div>
+  </div>
+  <div class="card">
+    <h2>各系列應用優勢</h2>
+    <div class="tblwrap"><table>
+      <tr><th>系列</th><th>類型</th><th>優勢</th><th>典型應用</th><th>適用軸向</th></tr>
+      <tr><td>E-MGT</td><td>導軌內嵌螺桿</td><td class="wrapok">高剛性、±0.01 mm、體積精簡、研磨螺桿、噪音 &lt;70dB 全數出廠測試</td><td class="wrapok">檢測、點膠、中小負載精密定位</td><td>X / Y / Z 首選</td></tr>
+      <tr><td>E-MTH（E-MTHE）</td><td>標準螺桿</td><td class="wrapok">大負載（水平 150 kg）、行程至 1500 mm、E-MTHE 研磨螺桿低噪音（-2.6dB avg）</td><td class="wrapok">大負載搬運、Z 軸升降、龍門架構</td><td>X / Y / Z</td></tr>
+      <tr><td>E-MCH（E-MCHE）</td><td>無塵螺桿</td><td class="wrapok">全封閉 Low-Dust、規格對應 E-MTH、±0.01 mm</td><td class="wrapok">半導體、光電、潔淨製程</td><td>X / Y / Z（無塵）</td></tr>
+      <tr><td>E-MTB</td><td>標準皮帶</td><td class="wrapok">行程至 2550 mm、速度 2000 mm/s 全行程恆定、E-MTB10/14 含減速機</td><td class="wrapok">長行程 X 軸主力、跨站搬送</td><td>X / Y（不可垂直）</td></tr>
+      <tr><td>E-MCB</td><td>無塵皮帶</td><td class="wrapok">全封閉＋長行程＋2000 mm/s、聚氨酯皮帶</td><td class="wrapok">無塵室輕載高速水平搬送</td><td>X / Y（不可垂直）</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- ===== 型號查詢 ===== -->
+<section class="pane" id="pane-query">
+  <div class="split">
+    <div class="panel">
+      <label>型號 / 系列<span class="hint">支援大小寫與模糊查詢；輸入系列名稱可列出相關候選。</span></label>
+      <input id="q_kw" placeholder="例如 E-MGT8 或 MCH">
+      <button class="btn" onclick="runQuery()">查詢</button>
+      <p class="note">收錄 14 個主力系列＋型錄補充小尺寸系列（E-MTHE5〜14 / E-MCHE5〜12）。</p>
+    </div>
+    <div class="main" id="q_out"><div class="card"><div class="placeholder">輸入型號或系列後顯示完整規格與官方下載來源。</div></div></div>
+  </div>
+</section>
+
+<!-- ===== 單軸條件推薦 ===== -->
+<section class="pane on" id="pane-reco">
+  <div class="split">
+    <div class="panel">
+      <div class="grid2">
+        <div><label>使用軸向</label><select id="r_axis"><option value="X">X 軸（水平）</option><option value="Y">Y 軸（水平）</option><option value="Z">Z 軸（垂直）</option></select></div>
+        <div><label>驅動方式</label><select id="r_drive"><option value="">不限</option><option value="screw">螺桿</option><option value="belt">皮帶</option></select></div>
+        <div><label>負載 <span class="u">kg</span></label><input id="r_load" type="number" min="0" step="0.1" placeholder="工件＋治具＋上層軸"></div>
+        <div><label>行程需求 <span class="u">mm</span></label><input id="r_stroke" type="number" min="0" step="10" placeholder="例如 600"></div>
+        <div><label>速度需求 <span class="u">mm/s</span></label><input id="r_speed" type="number" min="0" placeholder="可留空"></div>
+        <div><label>重複精度需求 <span class="u">±mm</span></label><input id="r_prec" type="number" min="0" step="0.001" placeholder="例如 0.01，可留空"></div>
+        <div><label>環境</label><select id="r_env"><option value="std">標準</option><option value="clean">無塵室 / 半導體</option></select></div>
+        <div><label>主要應用</label><select id="r_app"><option value="">不指定</option><option value="dispense">點膠 / 塗膠</option><option value="inspect">檢測 / 視覺</option><option value="pick">搬運 / 取放</option><option value="long">長行程高速搬送</option><option value="precision">高精度定位</option><option value="zlift">Z軸升降</option><option value="press">壓入 / 推壓</option></select></div>
+      </div>
+      <button class="btn" onclick="runReco()">產生推薦</button>
+      <p class="note">硬條件：軸向、負載、行程、速度、精度、環境。其餘以分數排序，列出 Top 5。Z 軸負載以垂直可搬重量判定。導程選擇與推力請到「工程確認」。</p>
+    </div>
+    <div class="main" id="r_out"><div class="card"><div class="placeholder">輸入負載與行程後產生 Top 5 推薦。</div></div></div>
+  </div>
+</section>
+
+<!-- ===== 三軸自組推薦 ===== -->
+<section class="pane" id="pane-triple">
+  <div class="split">
+    <div class="panel">
+      <div class="grid2">
+        <div><label>X 行程 <span class="u">mm</span></label><input id="t_x" type="number" min="0" step="50" placeholder="例如 800"></div>
+        <div><label>Y 行程 <span class="u">mm</span></label><input id="t_y" type="number" min="0" step="50" placeholder="例如 400"></div>
+        <div><label>Z 行程 <span class="u">mm</span></label><input id="t_z" type="number" min="0" step="50" placeholder="例如 200"></div>
+        <div><label>載台負載 <span class="u">kg</span></label><input id="t_load" type="number" min="0" step="0.1" placeholder="工件＋治具"></div>
+      </div>
+      <label>選型優先</label><select id="t_pri"><option value="balance">均衡</option><option value="precision">精度優先</option><option value="speed">速度 / 長行程優先</option></select>
+      <button class="btn" onclick="runTriple()">推介產生</button>
+      <p class="note">MISUMI Economy 系列無標準直交模組；本工具依單軸規格自動評分 X / Y / Z 自組組合（Y 軸加計 Z 軸本體重、X 軸加計 Y＋Z 總重），轉接治具需自行設計，請以官方 PDF 校核。</p>
+    </div>
+    <div class="main" id="t_out"><div class="card"><div class="placeholder">輸入 X / Y / Z 行程與負載後評分。</div></div></div>
+  </div>
+</section>
+
+<!-- ===== 工程確認 ===== -->
+<section class="pane" id="pane-eng">
+  <div class="split">
+    <div class="panel">
+      <label>型號 / 系列</label><select id="e_model"></select>
+      <div class="grid2">
+        <div><label>導程 <span class="u">mm</span></label><select id="e_lead"></select></div>
+        <div><label>安裝軸向</label><select id="e_axis"><option value="H">水平（X / Y）</option><option value="V">垂直（Z）</option></select></div>
+        <div><label>負載 <span class="u">kg</span></label><input id="e_load" type="number" min="0" step="0.1" value="10"></div>
+        <div><label>行程需求 <span class="u">mm</span></label><input id="e_stroke" type="number" min="0" step="50" value="400"></div>
+        <div><label>目標速度 <span class="u">mm/s</span></label><input id="e_speed" type="number" min="0" value="200"></div>
+        <div><label>推壓力需求 <span class="u">N</span></label><input id="e_push" type="number" min="0" value="0"></div>
+        <div><label>安全係數</label><input id="e_sf" type="number" min="1" step="0.1" value="1.5"></div>
+        <div><label>加減速 <span class="u">G</span></label><input id="e_g" type="number" min="0" step="0.05" value="0.3"></div>
+        <div><label>重心高度 Lz <span class="u">mm</span><span class="hint">滑台面到負載重心的垂直高度</span></label><input id="e_lz" type="number" value="50"></div>
+        <div><label>重心偏移 Lx <span class="u">mm</span><span class="hint">沿行進方向的重心偏移（可輸入負值）</span></label><input id="e_lx" type="number" value="0"></div>
+        <div><label>重心偏移 Ly <span class="u">mm</span><span class="hint">沿寬度方向的重心偏移（可輸入負值）</span></label><input id="e_ly" type="number" value="0"></div>
+      </div>
+      <button class="btn" onclick="runEng()">重新計算</button>
+      <button class="btn ghost no-print" onclick="exportReport()">匯出工程報告</button>
+      <p class="note">負載與推力依安全係數放大後判定；工程判定依「螺桿導程別」數據計算，並含重心力矩（MY / MP / MR）簡化檢核（靜態容許值）。</p>
+    </div>
+    <div class="main" id="e_out"><div class="card"><div class="placeholder">選擇型號並輸入條件後進行工程檢核。</div></div></div>
+  </div>
+</section>
+
+</div>
+<script>
+"use strict";
+/* ============ 資料字典（來源：三住 經濟型單軸致動器 規格資料庫 v1.2，2026-07-10） ============ */
+const LINK=p=>p?("https://tw.misumi-ec.com/vona2/detail/"+p+"/"):null;
+const D5A=[[50,1],[100,.9],[150,.8],[200,.7],[250,.6]];
+const D8=[[50,1],[100,.9],[150,.8],[200,.7],[250,.6],[300,.5],[350,.4],[400,.3]];
+const D12=[[50,1],[100,.9],[150,.8],[200,.7],[250,.668],[300,.632],[350,.6],[400,.532],[450,.5]];
+const D17=[[100,1],[150,.9],[200,.8],[250,.7],[300,.6]];
+const D22=[[100,1],[150,.9],[200,.8],[250,.7],[300,.6],[350,.5],[400,.4]];
+const DB=[
+{id:"E-MGT5",alias:[],cat:"內嵌導軌型 半封閉",drive:"screw",env:"std",width:54,screw:"Ø12 C7 研磨",motors:[100],prec:0.01,smin:50,smax:800,leads:[{L:5,h:30,v:10,vmax:250,F:{100:341}},{L:10,h:15,v:5,vmax:500,F:{100:170}},{L:20,h:10,v:2.5,vmax:1000,F:{100:85}}],M:{MY:103,MP:103,MR:144},len:"BC：行程+220.5mm",wt:[1.65,4.09],pid:"110310610649",der:D5A,acc:"感測器 C-MSX674N-2M×3、BC 聯軸器 7×8、折返皮帶輪 S3M-24齒",note:"最小體積；每台出廠前測試，噪音 <70dB"},
+{id:"E-MGT8",alias:[],cat:"內嵌導軌型 半封閉",drive:"screw",env:"std",width:82,screw:"Ø16 C7 研磨",motors:[200,400],prec:0.01,smin:50,smax:1100,leads:[{L:5,h:50,v:15,vmax:250,F:{200:683,400:1388}},{L:10,h:30,v:8,vmax:500,F:{200:341,400:694}},{L:20,h:18,v:3,vmax:1000,F:{200:174,400:347}}],M:{MY:318,MP:318,MR:626},len:"BC：行程+278mm",wt:[3.91,11.12],pid:"110310610739",der:D8,acc:"感測器 C-MSX674N-2M×3、BC 聯軸器 10×11(200W)/10×14(400W)、折返皮帶輪 S3M-36齒",note:""},
+{id:"E-MGT12",alias:[],cat:"內嵌導軌型 半封閉",drive:"screw",env:"std",width:120,screw:"Ø16 C7 研磨",motors:[400],prec:0.01,smin:50,smax:1200,leads:[{L:5,h:110,v:33,vmax:250,F:{400:1388}},{L:10,h:88,v:22,vmax:500,F:{400:694}},{L:20,h:40,v:10,vmax:1000,F:{400:347}}],M:{MY:318,MP:318,MR:626},len:"BC：行程+294mm",wt:[5.05,13.26],pid:"110310668789",der:D12,acc:"感測器×3、聯軸器 / 皮帶輪同 E-MGT8 400W 規格",note:"大推力內嵌型"},
+{id:"E-MTH17",alias:["E-MTHE17"],cat:"螺桿驅動型 半封閉",drive:"screw",env:"std",width:170,screw:"Ø20 C7",motors:[400,750],prec:0.01,smin:100,smax:1250,leads:[{L:5,h:120,v:40,vmax:250,F:{400:1388,750:2563}},{L:10,h:110,v:30,vmax:500,F:{400:694,750:1281}},{L:20,h:75,v:14,vmax:1000,F:{400:374,750:640}}],M:{MY:1032,MP:1034,MR:908},len:"BC：行程+267mm",wt:[10.02,27.75],pid:"110310668159",der:D17,acc:"感測器 C-MSX672N-2M×3、BC 聯軸器 10×14(400W)/17×19(750W)、皮帶輪 S3M-36齒",note:"E-MTHE17 為研磨螺桿低噪音版（-2.6dB avg）"},
+{id:"E-MTH22",alias:["E-MTHE22"],cat:"螺桿驅動型 半封閉",drive:"screw",env:"std",width:220,screw:"Ø25 C7",motors:[750],prec:0.01,smin:100,smax:1500,leads:[{L:5,h:150,v:55,vmax:250,F:{750:2100}},{L:10,h:150,v:45,vmax:500,F:{750:1050}},{L:25,h:120,v:20,vmax:1250,F:{750:420}}],M:{MY:2052,MP:2052,MR:1810},len:"BC：行程+420mm／折返：行程+390mm",wt:[26.86,67.74],pid:"110310668069",der:D22,acc:"BC 聯軸器 17×19、BM 皮帶 S3M-330-20、BL/BR S3M-420-20",note:"Lead 第三檔為 25mm；推力採產品頁值（型錄 2563/1281/640N 不一致，已註記）"},
+{id:"E-MCH10",alias:["E-MCHE10"],cat:"螺桿驅動型 全封閉（無塵）",drive:"screw",env:"clean",width:102,screw:"Ø16 C7",motors:[100,200],prec:0.01,smin:100,smax:1050,leads:[{L:5,h:50,v:12,vmax:250,F:{100:341,200:683}},{L:10,h:30,v:8,vmax:500,F:{100:170,200:341}},{L:20,h:18,v:3,vmax:1000,F:{100:85,200:174}}],M:{MY:110,MP:110,MR:120},len:"BC：行程+284／BM：+268／BL·BR：+301mm",wt:[8.5,15.8],pid:"110310667259",der:D22,acc:"感測器 C-MSX672N-2M×3、BC 聯軸器 10×8(100W)/10×14(200W)、皮帶輪 5M-20齒",note:""},
+{id:"E-MCH14",alias:["E-MCHE14"],cat:"螺桿驅動型 全封閉（無塵）",drive:"screw",env:"clean",width:135,screw:"Ø16 C7",motors:[200,400],prec:0.01,smin:100,smax:1050,leads:[{L:5,h:95,v:27,vmax:250,F:{200:683,400:1388}},{L:10,h:75,v:18,vmax:500,F:{200:341,400:694}},{L:20,h:35,v:7,vmax:1000,F:{200:174,400:374}}],M:{MY:551,MP:552,MR:485},len:"BC：行程+297／BM：+289mm",wt:[10.6,19.9],pid:"110310666989",der:D22,acc:"BC 聯軸器 10×14、皮帶輪 S3M-36齒、皮帶 S3M-252-15 / S3M-318-15",note:""},
+{id:"E-MCH17",alias:["E-MCHE17"],cat:"螺桿驅動型 全封閉（無塵）",drive:"screw",env:"clean",width:170,screw:"Ø20 C7",motors:[400,750],prec:0.01,smin:100,smax:1250,leads:[{L:5,h:120,v:40,vmax:250,F:{400:1388,750:2563}},{L:10,h:110,v:30,vmax:500,F:{400:694,750:1281}},{L:20,h:75,v:14,vmax:1000,F:{400:374,750:640}}],M:{MY:1032,MP:1034,MR:908},len:"BC：行程+342／折返：+377mm（型錄）",wt:[14.8,32.8],pid:"110310666899",der:D17,acc:"BC 聯軸器 12×14(400W)/12×19(750W)、BM 皮帶 S3M-294-20、BL/BR S3M-384-20",note:"支援油嘴選項 -ZY（潤滑保養）"},
+{id:"E-MCH22",alias:["E-MCHE22"],cat:"螺桿驅動型 全封閉（無塵）",drive:"screw",env:"clean",width:220,screw:"Ø25 C7",motors:[750],prec:0.01,smin:100,smax:1500,leads:[{L:5,h:150,v:55,vmax:250,F:{750:2100}},{L:10,h:150,v:45,vmax:500,F:{750:1050}},{L:25,h:120,v:20,vmax:1250,F:{750:420}}],M:{MY:2052,MP:2052,MR:1810},len:"BC：行程+444／折返：+499mm",wt:[27.5,70.94],pid:"110310666809",der:D22,acc:"BC 聯軸器 17×19、皮帶輪 5M-25齒、BM 皮帶 5M-350-20、BL/BR 5M-450-20",note:"5M 皮帶規格（與 E-MTH22 的 S3M 不同）；推力採產品頁值"},
+{id:"E-MTB5",alias:[],cat:"皮帶驅動型 半封閉",drive:"belt",env:"std",width:null,screw:"皮帶 2GT-9",motors:[100],prec:0.04,smin:100,smax:800,leads:[{L:40,h:3,v:0,vmax:2000,F:{100:42}}],M:null,len:null,wt:null,pid:"110310667979",der:null,acc:"馬達位置 BM/BW、皮帶輪 2GT-20T",note:"不可垂直使用；速度全行程恆定"},
+{id:"E-MTB10",alias:[],cat:"皮帶驅動型 半封閉",drive:"belt",env:"std",width:null,screw:"皮帶 240-3GT-18",motors:[100],prec:0.04,smin:100,smax:2550,leads:[{L:32,h:10,v:0,vmax:1600,F:{100:61}}],M:null,len:null,wt:null,pid:"110310667799",der:null,acc:"馬達位置 L/R/LD/RD/LU/RU、含減速機、固定端 3GT-50T、馬達端 3GT-20T",note:"不可垂直使用；行程最長 2550mm"},
+{id:"E-MTB14",alias:[],cat:"皮帶驅動型 半封閉",drive:"belt",env:"std",width:null,screw:"皮帶 288-3GT-25",motors:[200],prec:0.04,smin:100,smax:2000,leads:[{L:40,h:25,v:0,vmax:2000,F:{200:100}}],M:null,len:null,wt:null,pid:"110310667709",der:null,acc:"馬達位置 L/R/LD/RD/LU/RU、含減速機、固定端 3GT-65T、馬達端 3GT-26T",note:"不可垂直使用；可訂至 3050mm"},
+{id:"E-MCB5",alias:[],cat:"皮帶驅動型 全封閉（無塵）",drive:"belt",env:"clean",width:null,screw:"皮帶（聚氨酯）",motors:[100],prec:0.04,smin:100,smax:800,leads:[{L:32,h:3,v:0,vmax:2000,F:{100:42}},{L:40,h:3,v:0,vmax:2000,F:{100:42}}],M:null,len:null,wt:null,pid:"110310666719",der:null,acc:"馬達位置 BM/BW",note:"不可垂直使用；L32 為全封閉規格"},
+{id:"E-MCB14",alias:[],cat:"皮帶驅動型 全封閉（無塵）",drive:"belt",env:"clean",width:null,screw:"皮帶（聚氨酯）",motors:[200],prec:0.04,smin:100,smax:2000,leads:[{L:40,h:25,v:0,vmax:2000,F:{200:100}}],M:null,len:null,wt:null,pid:"110310666449",der:null,acc:"馬達位置 L/R/LD/RD/LU/RU、S45C 等效皮帶輪",note:"不可垂直使用；可訂至 3050mm"},
+/* 型錄補充小尺寸系列 */
+{id:"E-MTHE5",alias:["E-MTH5"],cat:"螺桿驅動型 半封閉（型錄補充）",drive:"screw",env:"std",width:51,screw:"Ø12 C7",motors:[100],prec:0.01,smin:50,smax:800,leads:[{L:5,h:10,v:3,vmax:250,F:{100:341}},{L:10,h:5,v:1.5,vmax:500,F:{100:170}}],M:{MY:16,MP:20,MR:19},len:"見型錄 01-121〜124",wt:[2.1,3.7],pid:null,der:null,acc:"見型錄",note:"型錄補充系列（未逐項比對網頁）"},
+{id:"E-MTHE6",alias:["E-MTH6"],cat:"螺桿驅動型 半封閉（型錄補充）",drive:"screw",env:"std",width:65,screw:"Ø12 C7",motors:[100],prec:0.01,smin:100,smax:800,leads:[{L:5,h:30,v:10,vmax:250,F:{100:341}},{L:10,h:15,v:5,vmax:500,F:{100:170}},{L:20,h:10,v:2,vmax:1000,F:{100:85}}],M:{MY:70,MP:80,MR:75},len:"BC：行程+200mm（同全封閉版）",wt:[2.6,5.1],pid:null,der:null,acc:"見型錄",note:"型錄補充系列"},
+{id:"E-MTHE10",alias:["E-MTH10"],cat:"螺桿驅動型 半封閉（型錄補充）",drive:"screw",env:"std",width:102,screw:"Ø16 C7",motors:[100,200],prec:0.01,smin:100,smax:1050,leads:[{L:5,h:50,v:12,vmax:250,F:{100:341,200:683}},{L:10,h:30,v:8,vmax:500,F:{100:170,200:341}},{L:20,h:18,v:3,vmax:1000,F:{100:85,200:174}}],M:{MY:110,MP:110,MR:120},len:"見型錄 01-129〜132",wt:[5.5,12.8],pid:null,der:D22,acc:"見型錄",note:"型錄補充系列；規格對應 E-MCH10 半封閉版"},
+{id:"E-MTHE12",alias:["E-MTH12"],cat:"螺桿驅動型 半封閉（型錄補充）",drive:"screw",env:"std",width:102,screw:"Ø16 C7",motors:[100,200],prec:0.01,smin:100,smax:1050,leads:[{L:5,h:50,v:12,vmax:250,F:{100:341,200:683}},{L:10,h:30,v:8,vmax:500,F:{100:170,200:341}},{L:20,h:18,v:3,vmax:1000,F:{100:85,200:174}}],M:{MY:150,MP:150,MR:130},len:"見型錄 01-133〜136",wt:[6.05,13.85],pid:null,der:D22,acc:"見型錄",note:"型錄補充系列；型錄總表體寬列 102mm"},
+{id:"E-MTHE13",alias:["E-MTH13"],cat:"螺桿驅動型 半封閉（型錄補充）",drive:"screw",env:"std",width:135,screw:"Ø16 C7",motors:[200,400],prec:0.01,smin:100,smax:1050,leads:[{L:5,h:70,v:17,vmax:250,F:{200:683,400:1388}},{L:10,h:47,v:12,vmax:500,F:{200:341,400:694}},{L:20,h:24,v:6,vmax:1000,F:{200:174,400:347}}],M:{MY:174,MP:175,MR:153},len:"見型錄 01-137〜140",wt:[8.5,19.7],pid:null,der:D22,acc:"見型錄",note:"型錄補充系列"},
+{id:"E-MTHE14",alias:["E-MTH14"],cat:"螺桿驅動型 半封閉（型錄補充）",drive:"screw",env:"std",width:135,screw:"Ø16 C7",motors:[200,400],prec:0.01,smin:100,smax:1050,leads:[{L:5,h:95,v:27,vmax:250,F:{200:683,400:1388}},{L:10,h:75,v:18,vmax:500,F:{200:341,400:694}},{L:20,h:35,v:7,vmax:1000,F:{200:174,400:374}}],M:{MY:551,MP:552,MR:485},len:"見型錄 01-141〜144",wt:[10.6,19.9],pid:null,der:D22,acc:"見型錄",note:"型錄補充系列；力矩與重量參照全封閉版 E-MCH14"},
+{id:"E-MCHE5",alias:["E-MCH5"],cat:"螺桿驅動型 全封閉（型錄補充）",drive:"screw",env:"clean",width:51,screw:"Ø12 C7",motors:[100],prec:0.01,smin:50,smax:800,leads:[{L:5,h:10,v:3,vmax:250,F:{100:341}},{L:10,h:5,v:1.5,vmax:500,F:{100:170}}],M:{MY:16,MP:20,MR:19},len:"見型錄 01-153〜156",wt:[2.1,3.7],pid:null,der:null,acc:"見型錄",note:"型錄補充系列；尺寸/力矩同 E-MTHE5"},
+{id:"E-MCHE6",alias:["E-MCH6"],cat:"螺桿驅動型 全封閉（型錄補充）",drive:"screw",env:"clean",width:65,screw:"Ø12 C7",motors:[100],prec:0.01,smin:100,smax:800,leads:[{L:5,h:30,v:10,vmax:250,F:{100:341}},{L:10,h:15,v:5,vmax:500,F:{100:170}},{L:20,h:10,v:2,vmax:1000,F:{100:85}}],M:{MY:70,MP:80,MR:75},len:"BC：行程+200mm",wt:[2.6,5.1],pid:null,der:null,acc:"見型錄",note:"型錄補充系列"},
+{id:"E-MCHE12",alias:["E-MCH12"],cat:"螺桿驅動型 全封閉（型錄補充）",drive:"screw",env:"clean",width:102,screw:"Ø16 C7",motors:[100,200],prec:0.01,smin:100,smax:1050,leads:[{L:5,h:50,v:12,vmax:250,F:{100:341,200:683}},{L:10,h:30,v:8,vmax:500,F:{100:170,200:341}},{L:20,h:18,v:3,vmax:1000,F:{100:85,200:174}}],M:{MY:150,MP:150,MR:130},len:"見型錄 01-165〜168",wt:[6.05,13.85],pid:null,der:D22,acc:"皮帶輪 5M-20齒、BM 皮帶 5M-275-20、BL/BR 5M-325-20、BC 聯軸器 10×8(100W)/10×14(200W)",note:"型錄補充系列"}
+];
+/* ============ 共用函式 ============ */
+const $=id=>document.getElementById(id);
+const fmt=(n,d)=>n==null?"—":Number(n).toFixed(d==null?0:d).replace(/\.0+$/,"");
+function speedAt(s,lead,stroke){
+  if(!s.der){return {v:lead.vmax,ex:stroke>400};}
+  const t=s.der;
+  if(stroke<=t[0][0])return{v:lead.vmax,ex:false};
+  for(let i=1;i<t.length;i++){
+    if(stroke<=t[i][0]){
+      const [s0,f0]=t[i-1],[s1,f1]=t[i];
+      const f=f0+(f1-f0)*(stroke-s0)/(s1-s0);
+      return{v:lead.vmax*f,ex:false};
+    }
+  }
+  return{v:lead.vmax*t[t.length-1][1],ex:true};
+}
+function wtAt(s,stroke){
+  if(!s.wt)return null;
+  const x=Math.min(Math.max(stroke,s.smin),s.smax);
+  return s.wt[0]+(s.wt[1]-s.wt[0])*(x-s.smin)/(s.smax-s.smin);
+}
+const maxF=lead=>Math.max.apply(null,Object.values(lead.F));
+const FStr=lead=>Object.keys(lead.F).map(k=>k+"W："+lead.F[k]+"N").join("／");
+function verdict(u){return u<=0.8?{c:"ok",t:"OK"}:u<=1?{c:"warn",t:"Warning"}:{c:"ng",t:"NG"};}
+function roundStroke(x){return Math.ceil(x/50)*50;}
+function esc(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+/* ============ 分頁切換 ============ */
+document.querySelectorAll("#tabs button").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("on"));
+    document.querySelectorAll(".pane").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    $("pane-"+b.dataset.t).classList.add("on");
+  };
+});
+/* ============ 型號查詢 ============ */
+function specCard(s){
+  let h='<div class="card">';
+  h+='<h2>'+esc(s.id)+(s.alias.length?' <span class="badge-src">（'+esc(s.alias.join(" / "))+'）</span>':'')+'</h2>';
+  h+='<div class="kv">';
+  h+='<div><b>類型：</b>'+esc(s.cat)+'</div>';
+  h+='<div><b>驅動：</b>'+(s.drive==="screw"?"滾珠螺桿 "+esc(s.screw):esc(s.screw))+'</div>';
+  h+='<div><b>體寬：</b>'+(s.width?s.width+" mm":"—")+'</div>';
+  h+='<div><b>馬達：</b>'+s.motors.map(m=>m+"W").join(" / ")+'（另購）</div>';
+  h+='<div><b>行程：</b>'+s.smin+'〜'+s.smax+' mm（50 級距）</div>';
+  h+='<div><b>重複精度：</b>±'+s.prec+' mm</div>';
+  h+='<div><b>環境：</b>'+(s.env==="clean"?"無塵室 / 半導體":"標準")+'</div>';
+  h+='<div><b>本體重量：</b>'+(s.wt?s.wt[0]+'〜'+s.wt[1]+' kg':'見型錄')+'</div>';
+  h+='</div>';
+  h+='<h3>導程別規格</h3><div class="tblwrap"><table><tr><th>Lead (mm)</th><th>水平最大 (kg)</th><th>垂直最大 (kg)</th><th>最大速度 (mm/s)</th><th>額定推力 (N)</th></tr>';
+  s.leads.forEach(l=>{h+='<tr><td>'+l.L+'</td><td>'+l.h+'</td><td>'+(l.v||"—（不可垂直）")+'</td><td>'+l.vmax+'</td><td>'+FStr(l)+'</td></tr>';});
+  h+='</table></div>';
+  h+='<div class="kv" style="margin-top:8px">';
+  if(s.M)h+='<div><b>靜態容許力矩：</b>MY='+s.M.MY+'、MP='+s.M.MP+'、MR='+s.M.MR+' N·m</div>';
+  if(s.len)h+='<div><b>本體全長：</b>'+esc(s.len)+'</div>';
+  h+='<div><b>配件：</b>'+esc(s.acc)+'</div>';
+  h+='</div>';
+  if(s.note)h+='<p class="note">註：'+esc(s.note)+'</p>';
+  if(s.pid)h+='<p style="margin-top:8px"><a href="'+LINK(s.pid)+'" target="_blank">台灣三住官方產品頁（規格 / CAD / 價格） →</a> <span class="badge-src">Product ID '+s.pid+'</span></p>';
+  else h+='<p class="note">資料來源：E-MTHE &amp; E-MCHE 官方型錄 PDF（2025.11）</p>';
+  h+='</div>';
+  return h;
+}
+function runQuery(){
+  const kw=($("q_kw").value||"").toUpperCase().replace(/[\s-]/g,"");
+  if(!kw){$("q_out").innerHTML='<div class="card"><div class="placeholder">請輸入型號或系列關鍵字。</div></div>';return;}
+  const hit=DB.filter(s=>{
+    const keys=[s.id].concat(s.alias).map(x=>x.toUpperCase().replace(/[\s-]/g,""));
+    return keys.some(k=>k.includes(kw)||kw.includes(k));
+  });
+  $("q_out").innerHTML=hit.length?hit.slice(0,8).map(specCard).join(""):'<div class="card"><div class="placeholder">查無符合型號；請試 E-MGT / E-MTH / E-MCH / E-MTB / E-MCB 系列名。</div></div>';
+}
+</script>
+<script>
+"use strict";
+/* ============ 單軸條件推薦 ============ */
+const APP_PREF={dispense:{fam:["E-MGT","E-MCH"],prec:0.01},inspect:{fam:["E-MGT"],prec:0.01},pick:{fam:["E-MTH","E-MTB","E-MCH"],prec:null},long:{fam:["E-MTB","E-MCB"],prec:null},precision:{fam:["E-MGT","E-MCH"],prec:0.01},zlift:{fam:["E-MTH","E-MGT","E-MCH"],prec:null},press:{fam:["E-MTH","E-MGT"],prec:null}};
+function famOf(id){return id.replace(/E-(M[TCG][HBT]?E?)\d.*/,"E-$1").replace("E-MTHE","E-MTH").replace("E-MCHE","E-MCH");}
+function evalSeries(s,q){
+  // q={axis,drive,load,stroke,speed,prec,env,app}
+  if(q.env==="clean"&&s.env!=="clean")return null;
+  if(q.drive&&s.drive!==q.drive)return null;
+  if(q.axis==="Z"&&s.drive==="belt")return null;
+  if(q.stroke&&(q.stroke<s.smin||q.stroke>s.smax))return null;
+  if(q.prec&&s.prec>q.prec+1e-9)return null;
+  let best=null;
+  s.leads.forEach(l=>{
+    const cap=q.axis==="Z"?l.v:l.h;
+    if(!cap||cap<q.load)return;
+    const sp=speedAt(s,l,q.stroke||s.smin);
+    if(q.speed&&sp.v<q.speed)return;
+    const u=q.load/cap;
+    let sc=0;
+    // 負載裕度：目標使用率 50〜80%
+    sc+= (u>=0.5&&u<=0.8)?40 : (u<0.5? 24+32*u : Math.max(0,40-(u-0.8)*150));
+    // 速度裕度
+    if(q.speed){const ms=sp.v/q.speed;sc+= ms>=1.2&&ms<=3?25 : ms<1.2? 15+ (ms-1)*50 : Math.max(10,25-(ms-3)*3);}else sc+=18;
+    // 行程適配：避免大機態跨小行程
+    if(q.stroke){const r=q.stroke/s.smax;sc+= r>=0.3?15 : 8+r*23;}else sc+=10;
+    // 精度餘裕
+    if(q.prec)sc+= s.prec<=q.prec/2?8:5; else sc+=5;
+    // 應用加分
+    if(q.app&&APP_PREF[q.app]){const p=APP_PREF[q.app];if(p.fam.includes(famOf(s.id)))sc+=10;if(p.prec&&s.prec<=p.prec)sc+=2;}else sc+=5;
+    // 環境：標準環境用無塵款略扣（成本）
+    if(q.env==="std"&&s.env==="clean")sc-=4;
+    if((s.cat||"").includes("型錄補充"))sc-=3;
+    if(sp.ex)sc-=3;
+    const rec={lead:l,cap:cap,u:u,v:sp.v,ex:sp.ex,score:sc};
+    if(!best||rec.score>best.score)best=rec;
+  });
+  return best?{s:s,b:best}:null;
+}
+function runReco(){
+  const q={axis:$("r_axis").value,drive:$("r_drive").value,load:parseFloat($("r_load").value),stroke:parseFloat($("r_stroke").value),speed:parseFloat($("r_speed").value)||null,prec:parseFloat($("r_prec").value)||null,env:$("r_env").value,app:$("r_app").value};
+  if(!(q.load>0)||!(q.stroke>0)){$("r_out").innerHTML='<div class="card"><div class="placeholder">請至少輸入負載與行程。</div></div>';return;}
+  const res=DB.map(s=>evalSeries(s,q)).filter(Boolean).sort((a,b)=>b.b.score-a.b.score);
+  if(!res.length){$("r_out").innerHTML='<div class="card"><div class="placeholder">無符合硬條件的型號。建議：降低負載或速度需求、縮短行程，或放寬驅動方式 / 精度限制；Z 軸大負載可評估 E-MTH22（垂直 55 kg）。</div></div>';return;}
+  const top=res.slice(0,5);
+  let h='<div class="metrics">';
+  h+='<div class="metric"><div class="k">符合候選</div><div class="v">'+res.length+'</div><div class="s">通過硬條件</div></div>';
+  h+='<div class="metric"><div class="k">最佳型號</div><div class="v">'+esc(top[0].s.id)+'</div><div class="s">Lead '+top[0].b.lead.L+' mm</div></div>';
+  h+='<div class="metric"><div class="k">負載使用率</div><div class="v">'+fmt(top[0].b.u*100)+'%</div><div class="s">建議 50〜80%</div></div>';
+  h+='<div class="metric"><div class="k">行程可達速度</div><div class="v">'+fmt(top[0].b.v)+'</div><div class="s">mm/s @ '+q.stroke+' mm</div></div>';
+  h+='</div>';
+  top.forEach((r,i)=>{
+    const s=r.s,b=r.b;
+    h+='<div class="reco"><span class="score">'+fmt(b.score)+' 分</span><h3>#'+(i+1)+'　'+esc(s.id)+' － Lead '+b.lead.L+'</h3><div class="sub">'+esc(s.cat)+'｜±'+s.prec+' mm｜馬達 '+s.motors.map(m=>m+"W").join("/")+'</div>';
+    h+='<div class="kv">';
+    h+='<div><b>'+(q.axis==="Z"?"垂直":"水平")+'可搬：</b>'+b.cap+' kg（使用率 '+fmt(b.u*100)+'%）</div>';
+    h+='<div><b>可達速度：</b>'+fmt(b.v)+' mm/s'+(b.ex?'（❗超出已收集速度表，需依型錄臨界轉速校核）':'')+'</div>';
+    h+='<div><b>額定推力：</b>'+FStr(b.lead)+'</div>';
+    h+='<div><b>行程範圍：</b>'+s.smin+'〜'+s.smax+' mm</div>';
+    if(s.M)h+='<div><b>容許力矩：</b>MY '+s.M.MY+'／MP '+s.M.MP+'／MR '+s.M.MR+' N·m</div>';
+    if(s.wt)h+='<div><b>本體重：</b>約 '+fmt(wtAt(s,q.stroke),1)+' kg @ '+q.stroke+' mm</div>';
+    h+='</div>';
+    if(s.note)h+='<p class="note">'+esc(s.note)+'</p>';
+    h+='<p style="margin-top:4px">'+(s.pid?'<a href="'+LINK(s.pid)+'" target="_blank">台灣三住產品頁 →</a>':'<span class="badge-src">來源：官方型錄 PDF</span>')+'</p></div>';
+  });
+  h+='<p class="note">建議訂購行程：'+roundStroke(q.stroke)+' mm（50 級距進位）。導程與推力、力矩詳細檢核請到「工程確認」分頁。</p>';
+  $("r_out").innerHTML=h;
+}
+/* ============ 三軸自組推薦 ============ */
+function pickAxis(axis,load,stroke,pri,needClean){
+  const q={axis:axis,drive:"",load:load,stroke:stroke,speed:null,prec:null,env:needClean?"clean":"std",app:""};
+  let res=DB.map(s=>evalSeries(s,q)).filter(Boolean);
+  res.forEach(r=>{
+    if(pri==="precision"){if(r.s.prec<=0.01)r.b.score+=12;if(famOf(r.s.id)==="E-MGT")r.b.score+=6;if(r.s.drive==="belt")r.b.score-=15;}
+    if(pri==="speed"){if(r.s.drive==="belt"&&axis!=="Z")r.b.score+=15;if(r.b.lead.L>=10)r.b.score+=5;}
+    if(axis!=="X"&&!r.s.wt)r.b.score-=8; // 上層軸需估本體重
+  });
+  return res.sort((a,b)=>b.b.score-a.b.score);
+}
+function runTriple(){
+  const X=parseFloat($("t_x").value),Y=parseFloat($("t_y").value),Z=parseFloat($("t_z").value),W=parseFloat($("t_load").value),pri=$("t_pri").value;
+  if(!(X>0)||!(Y>0)||!(Z>0)||!(W>0)){$("t_out").innerHTML='<div class="card"><div class="placeholder">請輸入 X / Y / Z 行程與載台負載。</div></div>';return;}
+  const zs=pickAxis("Z",W,Z,pri,false);
+  if(!zs.length){$("t_out").innerHTML='<div class="card"><div class="placeholder">Z 軸無解：垂直可搬上限為 E-MTH22 / E-MCH22 的 55 kg（Lead 5），請降低負載或縮短 Z 行程。</div></div>';return;}
+  let combos=[];
+  zs.slice(0,3).forEach(zr=>{
+    const zw=wtAt(zr.s,Z)||8;
+    const ys=pickAxis("Y",W+zw,Y,pri,false);
+    ys.slice(0,2).forEach(yr=>{
+      const yw=wtAt(yr.s,Y)||10;
+      const xs=pickAxis("X",W+zw+yw,X,pri,false);
+      if(xs.length){
+        const xr=xs[0];
+        combos.push({z:zr,y:yr,x:xr,zw:zw,yw:yw,score:(zr.b.score+yr.b.score+xr.b.score)/3});
+      }
+    });
+  });
+  combos.sort((a,b)=>b.score-a.score);
+  combos=combos.filter((c,i,arr)=>arr.findIndex(o=>o.x.s.id===c.x.s.id&&o.y.s.id===c.y.s.id&&o.z.s.id===c.z.s.id)===i).slice(0,3);
+  if(!combos.length){$("t_out").innerHTML='<div class="card"><div class="placeholder">X / Y 軸無解：累計負載（含上層軸本體重）超過水平可搬上限 150 kg，或行程超出範圍。</div></div>';return;}
+  let h='<div class="metrics">';
+  h+='<div class="metric"><div class="k">推薦組合</div><div class="v">'+combos.length+'</div><div class="s">單軸自組</div></div>';
+  h+='<div class="metric"><div class="k">最佳組合</div><div class="v" style="font-size:14px">'+esc(combos[0].x.s.id)+' × '+esc(combos[0].y.s.id)+' × '+esc(combos[0].z.s.id)+'</div><div class="s">X × Y × Z</div></div>';
+  h+='<div class="metric"><div class="k">綜合分數</div><div class="v">'+fmt(combos[0].score)+'</div><div class="s">優先：'+({balance:"均衡",precision:"精度",speed:"速度/長行程"})[pri]+'</div></div>';
+  h+='</div>';
+  combos.forEach((c,i)=>{
+    h+='<div class="reco"><span class="score">'+fmt(c.score)+' 分</span><h3>組合 #'+(i+1)+'</h3>';
+    h+='<div class="tblwrap"><table><tr><th>軸</th><th>型號／Lead</th><th>設計負載</th><th>可搬</th><th>使用率</th><th>可達速度</th><th>行程</th></tr>';
+    [["Z（垂直）",c.z,W,Z],["Y（水平）",c.y,W+c.zw,Y],["X（水平）",c.x,W+c.zw+c.yw,X]].forEach(row=>{
+      const[name,r,ld,st]=row;
+      h+='<tr><td>'+name+'</td><td>'+esc(r.s.id)+'／L'+r.b.lead.L+'</td><td>'+fmt(ld,1)+' kg</td><td>'+r.b.cap+' kg</td><td>'+fmt(ld/r.b.cap*100)+'%</td><td>'+fmt(r.b.v)+' mm/s</td><td>'+st+' mm</td></tr>';
+    });
+    h+='</table></div>';
+    h+='<p class="note">Z 軸本體重估 '+fmt(c.zw,1)+' kg、Y 軸本體重估 '+fmt(c.yw,1)+' kg（依行程線性內插）；Y 軸設計負載＝載台＋Z 軸本體，X 軸＝載台＋Z＋Y 本體。垂直軸建議選用煞車馬達。</p>';
+    h+='</div>';
+  });
+  h+='<p class="note">MISUMI Economy 皆為單軸，直交組合需自行設計轉接板；重心懸臂力矩請到「工程確認」逐軸校核。</p>';
+  $("t_out").innerHTML=h;
+}
+/* ============ 工程確認 ============ */
+function fillEngModels(){
+  $("e_model").innerHTML=DB.map((s,i)=>'<option value="'+i+'">'+esc(s.id)+'｜'+esc(s.cat)+'</option>').join("");
+  fillEngLeads();
+}
+function fillEngLeads(){
+  const s=DB[+$("e_model").value];
+  $("e_lead").innerHTML=s.leads.map((l,i)=>'<option value="'+i+'">'+l.L+' mm</option>').join("");
+}
+$("e_model").addEventListener("change",fillEngLeads);
+let lastEng=null;
+function runEng(){
+  const s=DB[+$("e_model").value];
+  const lead=s.leads[+$("e_lead").value];
+  const V=$("e_axis").value==="V";
+  const m=parseFloat($("e_load").value)||0;
+  const st=parseFloat($("e_stroke").value)||0;
+  const vt=parseFloat($("e_speed").value)||0;
+  const push=parseFloat($("e_push").value)||0;
+  const SF=parseFloat($("e_sf").value)||1.5;
+  const G=parseFloat($("e_g").value)||0;
+  const Lz=parseFloat($("e_lz").value)||0,Lx=parseFloat($("e_lx").value)||0,Ly=parseFloat($("e_ly").value)||0;
+  const g=9.81,a=G*g;
+  const rows=[];const warns=[];
+  // 1) 垂直可用性
+  if(V&&(!lead.v||s.drive==="belt")){rows.push(["安裝軸向","垂直使用","不可",Infinity,"皮帶／該導程不可垂直使用"]);}
+  // 2) 負載
+  const cap=V?lead.v:lead.h;
+  if(cap)rows.push(["可搬重量（"+(V?"垂直":"水平")+"）",fmt(m*SF,1)+" kg（×SF）",cap+" kg",m*SF/cap,"Lead "+lead.L+" mm 規格值"]);
+  // 3) 行程
+  const stOK=st>=s.smin&&st<=s.smax;
+  rows.push(["行程範圍",st+" mm",s.smin+"〜"+s.smax+" mm",stOK?0.5:1.5,"建議訂購 "+roundStroke(st)+" mm"]);
+  // 4) 速度
+  const sp=speedAt(s,lead,st);
+  if(vt>0){rows.push(["目標速度",vt+" mm/s",fmt(sp.v)+" mm/s @ "+st+" mm",vt/sp.v,sp.ex?"超出已收集速度表，需型錄臨界轉速校核":"含行程–臨界轉速折減"]);if(sp.ex)warns.push("速度表外推：請以官方型錄「行程—最高速度表」校核 "+st+" mm 行程。");}
+  // 5) 推力
+  const Fr=maxF(lead);
+  const Fneed=(V?m*(g+a):m*a)+push;
+  if(Fr)rows.push(["推力需求（含加減速"+(V?"＋自重":"")+"）",fmt(Fneed*SF,1)+" N（×SF）",Fr+" N（"+Math.max.apply(null,s.motors)+"W）",Fneed*SF/Fr,"F = m·("+(V?"g＋":"")+"a)＋推壓力"]);
+  // 6) 力矩
+  if(s.M){
+    const MP=V?m*(g+a)*Math.abs(Lz)/1000:(m*g*Math.abs(Lx)+m*a*Math.abs(Lz))/1000;
+    const MR=V?m*(g+a)*Math.abs(Ly)/1000:m*g*Math.abs(Ly)/1000;
+    const MY=V?m*g*Math.abs(Lx)/1000:m*a*Math.abs(Ly)/1000;
+    rows.push(["俯仰力矩 MP",fmt(MP*SF,1)+" N·m（×SF）",s.M.MP+" N·m",MP*SF/s.M.MP,"靜態容許值簡化檢核"]);
+    rows.push(["橫滾力矩 MR",fmt(MR*SF,1)+" N·m（×SF）",s.M.MR+" N·m",MR*SF/s.M.MR,""]);
+    rows.push(["偏擺力矩 MY",fmt(MY*SF,1)+" N·m（×SF）",s.M.MY+" N·m",MY*SF/s.M.MY,""]);
+  }else warns.push("本系列未收錄靜態容許力矩，重心偏移工況請以官方型錄校核。");
+  // 彙整
+  let worst={u:0,name:"—"};
+  rows.forEach(r=>{if(isFinite(r[3])&&r[3]>worst.u)worst={u:r[3],name:r[0]};});
+  const vd=verdict(worst.u);
+  let h='<div class="metrics">';
+  h+='<div class="metric"><div class="k">綜合判定</div><div class="v"><span class="tag '+vd.c+'">'+vd.t+'</span></div><div class="s">'+esc(s.id)+'／Lead '+lead.L+'</div></div>';
+  h+='<div class="metric"><div class="k">最嚴苛項</div><div class="v" style="font-size:15px">'+esc(worst.name)+'</div><div class="s">使用率 '+fmt(worst.u*100)+'%</div></div>';
+  h+='<div class="metric"><div class="k">建議訂購行程</div><div class="v">'+roundStroke(st)+'</div><div class="s">mm（50 級距）</div></div>';
+  h+='<div class="metric"><div class="k">本體重量估計</div><div class="v">'+(s.wt?fmt(wtAt(s,st),1):"—")+'</div><div class="s">kg @ '+st+' mm</div></div>';
+  h+='</div>';
+  h+='<div class="card"><h2>工程檢核明細</h2><div class="tblwrap"><table><tr><th>項目</th><th>需求（含安全係數）</th><th>容許／規格</th><th>使用率</th><th>判定</th><th>備註</th></tr>';
+  rows.forEach(r=>{const v2=verdict(r[3]);h+='<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+(isFinite(r[3])?fmt(r[3]*100)+'%':"—")+'</td><td><span class="tag '+v2.c+'">'+v2.t+'</span></td><td class="wrapok">'+esc(r[4])+'</td></tr>';});
+  h+='</table></div>';
+  if(warns.length)h+='<p class="note">⚠️ '+warns.map(esc).join("；")+'</p>';
+  h+='<p class="note">判定基準：使用率 ≤80% OK／80〜100% Warning／&gt;100% NG。力矩為靜態容許值簡化檢核，動態工況、壽命計算請依官方型錄；馬達、驅動器、煞車選配另購。</p>';
+  h+='<p class="badge-src">資料來源：MISUMI 官方型錄 PDF（2025.11）與各系列產品頁'+(s.pid?'；<a href="'+LINK(s.pid)+'" target="_blank">台灣三住本型號產品頁 →</a>':'')+'</p></div>';
+  lastEng={s:s,lead:lead,inputs:{V:V,m:m,st:st,vt:vt,push:push,SF:SF,G:G,Lz:Lz,Lx:Lx,Ly:Ly}};
+  $("e_out").innerHTML=h;
+}
+function exportReport(){
+  if(!lastEng)runEng();
+  const p=$("pane-eng");
+  document.querySelectorAll(".pane").forEach(x=>x.classList.remove("print-target"));
+  p.classList.add("print-target");
+  const old=document.title;
+  document.title="GARMIN_PDO_三住滑台選型報告_"+(lastEng?lastEng.s.id:"");
+  window.print();
+  document.title=old;
+}
+fillEngModels();
+</script>
+</body>
+</html>
