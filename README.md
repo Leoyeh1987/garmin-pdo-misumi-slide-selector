@@ -1,4 +1,4 @@
-# Garmin PDO Misumi Slide Selector
+# Misumi Slide Selector
 
 Static single-page selection tool for Garmin PDO Misumi slide selection.
 
